@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Desofuscador Lua - Upload .txt</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: monospace;
+      padding: 20px;
+    }
+    input, button {
+      margin: 10px 0;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background-color: #1e1e1e;
+      color: #00ff90;
+      padding: 10px;
+      border: 1px solid #444;
+    }
+  </style>
+</head>
+<body>
+  <h1>📂 Desofuscador Lua (.txt)</h1>
+  <input type="file" id="fileInput" accept=".txt">
+  <button onclick="processarArquivo()">Desofuscar</button>
+  <h2>Resultado:</h2>
+  <pre id="output">Esperando arquivo...</pre>
+
+  <script>
+    function extrairStringsCodificadas(texto) {
+      const regex = /"(\\\d{2,3})+"/g;
+      const blocos = [];
+      let match;
+      while ((match = regex.exec(texto)) !== null) {
+        const numeros = match[0].match(/\d{2,3}/g);
+        if (numeros) {
+          const decodificado = numeros.map(n => String.fromCharCode(parseInt(n))).join("");
+          blocos.push(decodificado);
+        }
+      }
+      return blocos;
+    }
+
+    function processarArquivo() {
+      const arquivo = document.getElementById("fileInput").files[0];
+      if (!arquivo) {
+        alert("Selecione um arquivo .txt!");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const conteudo = e.target.result;
+        const desofuscado = extrairStringsCodificadas(conteudo).join("\n\n---\n\n");
+        document.getElementById("output").textContent = desofuscado || "Nada encontrado.";
+      };
+      reader.readAsText(arquivo);
+    }
+  </script>
+</body>
+</html>
